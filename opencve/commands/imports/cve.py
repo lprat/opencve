@@ -7,7 +7,6 @@ from urllib.parse import urlparse
 
 import arrow
 import feedparser
-import hashlib
 import requests
 
 from opencve.commands import header, info, timed_operation
@@ -37,16 +36,13 @@ def get_exploited_cve_from_rss():
     for url in cel.app.config["RSS_EXPLOITED"].replace(" ", "").split(','):
         limit_domain = urlparse(url).netloc
         result = requests.get(url, allow_redirects=False)
-        hash_rss = hashlib.sha256(result.text.encode()).hexdigest()
-        if hash_rss not in cel.app.config["HASH_RSS"]:
-            cel.app.config["HASH_RSS"].append(hash_rss)
-            feed = feedparser.parse(result.text)
-            for post in feed.entries:
-                todom = urlparse(post.link).netloc
-                if todom == limit_domain:
-                    result = requests.get(post.link, allow_redirects=True)
-                    found=re.findall(r'CVE\-[0-9]{4}\-[0-9]+',result.text)
-                    cve_exploited=list(set(cve_exploited + found))
+        feed = feedparser.parse(result.text)
+        for post in feed.entries:
+            todom = urlparse(post.link).netloc
+            if todom == limit_domain:
+                result = requests.get(post.link, allow_redirects=True)
+                found=re.findall(r'CVE\-[0-9]{4}\-[0-9]+',result.text)
+                cve_exploited=list(set(cve_exploited + found))
 
     return cve_exploited
 
