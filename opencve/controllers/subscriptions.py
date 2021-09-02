@@ -39,11 +39,11 @@ def subscribe_to_tag():
         # Mass subscribe
         if request.form["id"] == "all" and request.form["action"] == "subscribe":
             query = Vendor.query.filter_by()
-            modified=False
+            modified = False
             for vendor in query:
                 if vendor not in current_user.vendors:
                     current_user.vendors.append(vendor)
-                    modified=True
+                    modified = True
             if modified:
                 db.session.commit()
 
@@ -51,11 +51,11 @@ def subscribe_to_tag():
         # Mass unsubscribe
         if request.form["id"] == "all" and request.form["action"] == "unsubscribe":
             query = Vendor.query.filter_by()
-            modified=False
+            modified = False
             for vendor in query:
                 if vendor in current_user.vendors:
                     current_user.vendors.remove(vendor)
-                    modified=True
+                    modified = True
             if modified:
                 db.session.commit()
 

@@ -20,20 +20,22 @@ from opencve.models.tasks import Task
 
 NVD_CVE_URL = "https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-{year}.json.gz"
 
+
 def get_exploited_cve_from_rss():
     """
     GET RSS Flux to find CVE numbers exploited in wild
     """
-    cve_exploited=[]
+    cve_exploited = []
 
     if cel.app.config["EXPLOITED_LOCAL"]:
-        cve_exploited = \
-            cel.app.config["EXPLOITED_LOCAL"].upper().replace(" ", "").split(',')
+        cve_exploited = (
+            cel.app.config["EXPLOITED_LOCAL"].upper().replace(" ", "").split(",")
+        )
 
     if not cel.app.config["RSS_EXPLOITED"]:
         return cve_exploited
 
-    for url in cel.app.config["RSS_EXPLOITED"].replace(" ", "").split(','):
+    for url in cel.app.config["RSS_EXPLOITED"].replace(" ", "").split(","):
         limit_domain = urlparse(url).netloc
         result = requests.get(url, allow_redirects=False)
         feed = feedparser.parse(result.text)
@@ -41,10 +43,11 @@ def get_exploited_cve_from_rss():
             todom = urlparse(post.link).netloc
             if todom == limit_domain:
                 result = requests.get(post.link, allow_redirects=True)
-                found=re.findall(r'CVE\-[0-9]{4}\-[0-9]+',result.text)
-                cve_exploited=list(set(cve_exploited + found))
+                found = re.findall(r"CVE\-[0-9]{4}\-[0-9]+", result.text)
+                cve_exploited = list(set(cve_exploited + found))
 
     return cve_exploited
+
 
 def run():
     """
@@ -60,7 +63,6 @@ def run():
     db.session.commit()
     task_id = task.id
     exploit_db = get_exploited_cve_from_rss()
-    print("CVE exploited list: "+str(exploit_db))
 
     for year in range(CVE_FIRST_YEAR, CURRENT_YEAR + 1):
         header("Importing CVE for {}".format(year))
@@ -101,19 +103,19 @@ def run():
 
                 # Check Exploit
                 exploit_find = False
-                if ( (cel.app.config["EXPLOIT_LINK"] or cel.app.config["EXPLOIT_TAG"])
-                    and "reference_data" in item["cve"]["references"]):
+                if (
+                    cel.app.config["EXPLOIT_LINK"] or cel.app.config["EXPLOIT_TAG"]
+                ) and "reference_data" in item["cve"]["references"]:
                     for refs_cve in item["cve"]["references"]["reference_data"]:
                         if (
                             cel.app.config["EXPLOIT_TAG_NIST"]
                             and "tags" in refs_cve
-                            and cel.app.config["EXPLOIT_TAG_NIST"] in refs_cve["tags"]):
+                            and cel.app.config["EXPLOIT_TAG_NIST"] in refs_cve["tags"]
+                        ):
                             exploit_find = True
                             break
-                        if (
-                            cel.app.config["EXPLOIT_LINK"]
-                            and "url" in refs_cve):
-                            for links_refs in cel.app.config["EXPLOIT_LINK"].split(','):
+                        if cel.app.config["EXPLOIT_LINK"] and "url" in refs_cve:
+                            for links_refs in cel.app.config["EXPLOIT_LINK"].split(","):
                                 if links_refs in refs_cve["url"].lower():
                                     exploit_find = True
                                     break

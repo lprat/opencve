@@ -50,21 +50,23 @@ class References(BaseCheck):
         ]
 
         # Check exploit
-        if (payload["changed"] or payload["added"]
-            and (cel.app.config["EXPLOIT_LINK"] or cel.app.config["EXPLOIT_TAG"])):
+        if (
+            payload["changed"]
+            or payload["added"]
+            and (cel.app.config["EXPLOIT_LINK"] or cel.app.config["EXPLOIT_TAG"])
+        ):
             exploit_find = False
             for refs_cve in self.cve_json["cve"]["references"]["reference_data"]:
                 if (
                     cel.app.config["EXPLOIT_TAG_NIST"]
                     and "tags" in refs_cve
-                    and cel.app.config["EXPLOIT_TAG_NIST"] in refs_cve["tags"]):
+                    and cel.app.config["EXPLOIT_TAG_NIST"] in refs_cve["tags"]
+                ):
                     self.cve_obj.exploit = True
                     db.session.commit()
                     break
-                if (
-                    cel.app.config["EXPLOIT_LINK"]
-                    and "url" in refs_cve):
-                    for links_refs in cel.app.config["EXPLOIT_LINK"].split(','):
+                if cel.app.config["EXPLOIT_LINK"] and "url" in refs_cve:
+                    for links_refs in cel.app.config["EXPLOIT_LINK"].split(","):
                         if links_refs in refs_cve["url"].lower():
                             exploit_find = True
                             break

@@ -50,7 +50,7 @@ class CveUtil(object):
         return change
 
     @classmethod
-    def create_cve(cls, cve_json, exploited_db = []):
+    def create_cve(cls, cve_json, exploited_db=[]):
         cvss2 = (
             cve_json["impact"]["baseMetricV2"]["cvssV2"]["baseScore"]
             if "baseMetricV2" in cve_json["impact"]
@@ -71,19 +71,19 @@ class CveUtil(object):
 
         # Check Exploit
         exploit_find = False
-        if ( (cel.app.config["EXPLOIT_LINK"] or cel.app.config["EXPLOIT_TAG"])
-            and "reference_data" in cve_json["cve"]["references"]):
+        if (
+            cel.app.config["EXPLOIT_LINK"] or cel.app.config["EXPLOIT_TAG"]
+        ) and "reference_data" in cve_json["cve"]["references"]:
             for refs_cve in cve_json["cve"]["references"]["reference_data"]:
                 if (
                     cel.app.config["EXPLOIT_TAG_NIST"]
                     and "tags" in refs_cve
-                    and cel.app.config["EXPLOIT_TAG_NIST"] in refs_cve["tags"]):
+                    and cel.app.config["EXPLOIT_TAG_NIST"] in refs_cve["tags"]
+                ):
                     exploit_find = True
                     break
-                if (
-                    cel.app.config["EXPLOIT_LINK"]
-                    and "url" in refs_cve):
-                    for links_refs in cel.app.config["EXPLOIT_LINK"].split(','):
+                if cel.app.config["EXPLOIT_LINK"] and "url" in refs_cve:
+                    for links_refs in cel.app.config["EXPLOIT_LINK"].split(","):
                         if links_refs in refs_cve["url"].lower():
                             exploit_find = True
                             break

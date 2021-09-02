@@ -12,7 +12,16 @@ def get_default_filters():
     return {
         "cvss": 0,
         "exploit_or_exploited": False,
-        "event_types": ["new_cve", "references", "cvss", "cpes", "summary", "cwes", "exploit", "exploited"],
+        "event_types": [
+            "new_cve",
+            "references",
+            "cvss",
+            "cpes",
+            "summary",
+            "cwes",
+            "exploit",
+            "exploited",
+        ],
     }
 
 
